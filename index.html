@@ -1,0 +1,554 @@
+﻿<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>L9ate.store</title>
+  <meta name="description" content="L9ate.store headshot server" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Orbitron:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-a: #020817;
+      --bg-b: #0a1c3d;
+      --blue-1: #3fb6ff;
+      --blue-2: #0b78ff;
+      --text: #eaf4ff;
+      --muted: #9ec2e5;
+      --card: rgba(10, 22, 48, 0.78);
+      --line: rgba(99, 168, 255, 0.28);
+      --ok: #68ffad;
+      --bad: #ff7d7d;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at 15% 15%, #12458d 0%, transparent 35%),
+        radial-gradient(circle at 85% 85%, #0f2f72 0%, transparent 40%),
+        linear-gradient(155deg, var(--bg-a), var(--bg-b));
+      line-height: 1.35;
+    }
+
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image: linear-gradient(rgba(63, 182, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(63, 182, 255, 0.07) 1px, transparent 1px);
+      background-size: 34px 34px;
+      opacity: 0.55;
+    }
+
+    .topbar, .wrap, .footer {
+      width: min(980px, 92vw);
+      margin: 0 auto;
+    }
+
+    .topbar {
+      margin-top: 14px;
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(5, 16, 35, 0.72);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(8px);
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      color: var(--text);
+      text-decoration: none;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+    }
+
+    .topbar nav {
+      display: flex;
+      gap: 14px;
+    }
+
+    .topbar nav a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .topbar nav a:hover { color: var(--text); }
+
+    .lang-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .lang-wrap select {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(6, 15, 30, 0.85);
+      color: var(--text);
+      padding: 6px 8px;
+    }
+
+    .wrap {
+      display: grid;
+      place-items: center;
+      padding: 38px 0 24px;
+    }
+
+    .panel {
+      width: min(640px, 100%);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 24px 46px rgba(0, 0, 0, 0.35);
+      animation: rise-in 0.6s ease both;
+    }
+
+    .kicker {
+      color: var(--blue-1);
+      letter-spacing: 0.12em;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    h1 {
+      margin: 8px 0 4px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 6vw, 3rem);
+    }
+
+    .sub {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+
+    .status-strip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: #cfe7ff;
+      margin-bottom: 10px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #5cf5b0;
+      box-shadow: 0 0 10px rgba(92, 245, 176, 0.9);
+      animation: pulse 1.7s ease-in-out infinite;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .chips span {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      background: rgba(10, 30, 62, 0.45);
+    }
+
+    .users {
+      margin: 0 0 16px;
+      font-size: 1.06rem;
+    }
+
+    .users strong { color: var(--blue-1); }
+
+    .uid-form {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .uid-form input {
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: rgba(6, 15, 30, 0.85);
+      color: var(--text);
+      font-size: 1rem;
+      padding: 11px 12px;
+      outline: none;
+    }
+
+    .uid-form input:focus {
+      border-color: var(--blue-1);
+      box-shadow: 0 0 0 3px rgba(63, 182, 255, 0.2);
+    }
+
+    .uid-form button,
+    .cta {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-family: inherit;
+      font-weight: 700;
+      color: #001128;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(130deg, var(--blue-1), var(--blue-2));
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .uid-form button:hover,
+    .cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(16, 123, 255, 0.35);
+    }
+
+    .uid-form button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .form-msg {
+      min-height: 1.2em;
+      margin: 8px 0 0;
+    }
+
+    .form-msg.ok { color: var(--ok); }
+    .form-msg.bad { color: var(--bad); }
+
+    .box {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(5, 15, 31, 0.55);
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 1.2rem;
+    }
+
+    .config p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .config ul {
+      margin: 8px 0 10px;
+      padding-left: 18px;
+    }
+
+    .links div {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .links a {
+      color: var(--text);
+      text-decoration: none;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 12px;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .links a:hover {
+      border-color: var(--blue-1);
+      background: rgba(63, 182, 255, 0.1);
+    }
+
+    .footer {
+      padding: 10px 0 26px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @keyframes rise-in {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.25); }
+    }
+
+    @media (max-width: 620px) {
+      .uid-form { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; gap: 8px; }
+    }
+
+    html[dir='rtl'] body {
+      font-family: Tahoma, Arial, sans-serif;
+    }
+
+    html[dir='rtl'] .topbar {
+      flex-direction: row-reverse;
+    }
+
+    html[dir='rtl'] .topbar nav {
+      flex-direction: row-reverse;
+    }
+
+    html[dir='rtl'] .uid-form {
+      grid-template-columns: auto 1fr;
+    }
+
+    html[dir='rtl'] .uid-form input {
+      text-align: right;
+    }
+
+    @media (max-width: 620px) {
+      html[dir='rtl'] .uid-form { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg"></div>
+
+  <header class="topbar">
+    <a class="logo" href="#">L9ate.store</a>
+    <label class="lang-wrap" for="langSelect">
+      <span data-i18n="lang.label">Language</span>
+      <select id="langSelect" aria-label="Language selector">
+        <option value="en">English</option>
+        <option value="fr">Francais</option>
+        <option value="ar">Arabic</option>
+      </select>
+    </label>
+  </header>
+
+  <main id="inicio" class="wrap">
+    <section class="panel">
+      <p class="kicker" data-i18n="hero.kicker">HEADSHOT SERVER</p>
+      <h1>L9ate.store</h1>
+      <p class="sub" data-i18n="hero.sub">Improved to be faster, clearer, and more stable.</p>
+      <div class="status-strip" aria-live="polite">
+        <span class="dot"></span>
+        <span id="liveStatus" data-i18n="hero.status">Status: Online</span>
+      </div>
+      <div class="chips">
+        <span data-i18n="chips.no_login">No Login</span>
+        <span data-i18n="chips.fast">Fast Response</span>
+        <span data-i18n="chips.ui">Enhanced UI</span>
+      </div>
+
+      <p class="users"><span data-i18n="hero.users">Users in server:</span> <strong id="userCount" data-users="1337">1337</strong></p>
+
+      <form id="uidForm" class="uid-form" novalidate>
+        <input id="uidInput" type="text" inputmode="numeric" placeholder="Enter your UID" maxlength="12" data-i18n-placeholder="form.uid_placeholder" />
+        <button id="submitBtn" type="submit" data-i18n="form.submit">Send UID</button>
+      </form>
+      <p id="formMsg" class="form-msg" aria-live="polite"></p>
+
+      <section id="configuracion" class="config box">
+        <h2 data-i18n="config.title">Required Configuration</h2>
+        <p data-i18n="config.desc">Use this setup for the best result before testing sensitivity.</p>
+        <ul>
+          <li data-i18n="config.l1">Enable stable DPI on your device.</li>
+          <li data-i18n="config.l2">Restart Free Fire after applying settings.</li>
+          <li data-i18n="config.l3">Test in training mode for 5 minutes.</li>
+        </ul>
+        <a class="cta" href="NullXm3sb.cer" download="NullXm3sb.cer" data-i18n="config.cta">Install Certificat</a>
+      </section>
+
+      <section id="contacto" class="links box">
+        <h2 data-i18n="links.title">Official Links</h2>
+        <div>
+          <a href="https://www.instagram.com/meknasi.rdm?igsh=MTdxcGd0aDJuNXd6Yg%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" aria-label="Open Instagram">Instagram</a>
+          <a href="https://www.tiktok.com/@amnaynouri7" target="_blank" rel="noopener noreferrer" aria-label="Open TikTok">TikTok</a>
+          <a href="https://www.youtube.com/@L9ATEXit" target="_blank" rel="noopener noreferrer" aria-label="Open YouTube">YouTube</a>
+          <a href="https://discord.com/users/1376660571218251786" target="_blank" rel="noopener noreferrer" aria-label="Open Discord">Discord</a>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="footer"><span data-i18n="footer.copy">2026 L9ate.store</span></footer>
+
+  <script>
+    const translations = {
+      en: {
+        dir: 'ltr',
+        'nav.home': 'Home',
+        'nav.config': 'Configuration',
+        'nav.contact': 'Contact',
+        'lang.label': 'Language',
+        'hero.kicker': 'HEADSHOT SERVER',
+        'hero.sub': 'Improved to be faster, clearer, and more stable.',
+        'hero.status': 'Status: Online',
+        'chips.no_login': 'No Login',
+        'chips.fast': 'Fast Response',
+        'chips.ui': 'Enhanced UI',
+        'hero.users': 'Users in server:',
+        'form.uid_placeholder': 'Enter your UID',
+        'form.submit': 'Send UID',
+        'form.invalid': 'Invalid UID. Use 8 to 12 digits.',
+        'form.success': 'UID received. Your request was submitted.',
+        'form.sending': 'Sending...',
+        'config.title': 'Required Configuration',
+        'config.desc': 'Use this setup for the best result before testing sensitivity.',
+        'config.l1': 'Enable stable DPI on your device.',
+        'config.l2': 'Restart Free Fire after applying settings.',
+        'config.l3': 'Test in training mode for 5 minutes.',
+        'config.cta': 'Install Certificat',
+        'links.title': 'Official Links',
+        'footer.copy': '2026 L9ate.store'
+      },
+      fr: {
+        dir: 'ltr',
+        'nav.home': 'Accueil',
+        'nav.config': 'Configuration',
+        'nav.contact': 'Contact',
+        'lang.label': 'Langue',
+        'hero.kicker': 'SERVEUR HEADSHOT',
+        'hero.sub': 'Ameliore pour etre plus rapide, plus clair et plus stable.',
+        'hero.status': 'Statut : En ligne',
+        'chips.no_login': 'Sans connexion',
+        'chips.fast': 'Reponse rapide',
+        'chips.ui': 'Interface amelioree',
+        'hero.users': 'Utilisateurs sur le serveur :',
+        'form.uid_placeholder': 'Entrez votre UID',
+        'form.submit': 'Envoyer UID',
+        'form.invalid': 'UID invalide. Utilisez 8 a 12 chiffres.',
+        'form.success': 'UID recu. Votre demande a ete envoyee.',
+        'form.sending': 'Envoi...',
+        'config.title': 'Configuration requise',
+        'config.desc': 'Utilisez cette configuration pour un meilleur resultat avant de tester la sensibilite.',
+        'config.l1': 'Activez un DPI stable sur votre appareil.',
+        'config.l2': 'Redemarrez Free Fire apres application des reglages.',
+        'config.l3': 'Testez en mode entrainement pendant 5 minutes.',
+        'config.cta': 'Install Certificat',
+        'links.title': 'Liens officiels',
+        'footer.copy': '2026 L9ate.store'
+      },
+      ar: {
+        dir: 'rtl',
+        'nav.home': 'الرئيسية',
+        'nav.config': 'الاعدادات',
+        'nav.contact': 'التواصل',
+        'lang.label': 'اللغة',
+        'hero.kicker': 'سيرفر هيدشوت',
+        'hero.sub': 'نسخة محسنة لتكون اسرع واوضح واكثر استقرارا.',
+        'hero.status': 'الحالة: متصل',
+        'chips.no_login': 'بدون تسجيل',
+        'chips.fast': 'استجابة سريعة',
+        'chips.ui': 'واجهة محسنة',
+        'hero.users': 'المستخدمون في السيرفر:',
+        'form.uid_placeholder': 'ادخل UID',
+        'form.submit': 'ارسال UID',
+        'form.invalid': 'UID غير صالح. استخدم من 8 الى 12 رقما.',
+        'form.success': 'تم استلام UID. تم ارسال طلبك.',
+        'form.sending': 'جار الارسال...',
+        'config.title': 'الاعدادات المطلوبة',
+        'config.desc': 'استخدم هذه الاعدادات للحصول على افضل نتيجة قبل اختبار الحساسية.',
+        'config.l1': 'فعّل DPI ثابت على جهازك.',
+        'config.l2': 'اعد تشغيل Free Fire بعد تطبيق الاعدادات.',
+        'config.l3': 'اختبر في وضع التدريب لمدة 5 دقائق.',
+        'config.cta': 'Install Certificat',
+        'links.title': 'الروابط الرسمية',
+        'footer.copy': '2026 L9ate.store'
+      }
+    };
+
+    const uidForm = document.getElementById('uidForm');
+    const uidInput = document.getElementById('uidInput');
+    const formMsg = document.getElementById('formMsg');
+    const userCount = document.getElementById('userCount');
+    const submitBtn = document.getElementById('submitBtn');
+    const langSelect = document.getElementById('langSelect');
+    let currentLang = 'en';
+
+    function t(key) {
+      return translations[currentLang][key] || translations.en[key] || key;
+    }
+
+    function applyLanguage(lang) {
+      currentLang = translations[lang] ? lang : 'en';
+      const dict = translations[currentLang];
+      document.documentElement.lang = currentLang;
+      document.documentElement.dir = dict.dir;
+
+      document.querySelectorAll('[data-i18n]').forEach((el) => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.textContent = dict[key];
+      });
+
+      document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (dict[key]) el.setAttribute('placeholder', dict[key]);
+      });
+
+      langSelect.value = currentLang;
+    }
+
+    function animateUsers() {
+      const target = Number(userCount.dataset.users || 1337);
+      const start = Math.max(1000, target - 180);
+      const startTime = performance.now();
+      const duration = 1000;
+
+      function tick(now) {
+        const s = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - s, 3);
+        const value = Math.round(start + (target - start) * eased);
+        userCount.textContent = value.toLocaleString();
+        if (s < 1) requestAnimationFrame(tick);
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    uidForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const uid = uidInput.value.trim();
+
+      if (!/^\d{8,12}$/.test(uid)) {
+        formMsg.textContent = t('form.invalid');
+        formMsg.className = 'form-msg bad';
+        return;
+      }
+
+      submitBtn.disabled = true;
+      const oldText = submitBtn.textContent;
+      submitBtn.textContent = t('form.sending');
+
+      setTimeout(() => {
+        formMsg.textContent = t('form.success');
+        formMsg.className = 'form-msg ok';
+        uidForm.reset();
+        submitBtn.disabled = false;
+        submitBtn.textContent = oldText;
+        applyLanguage(currentLang);
+      }, 450);
+    });
+
+    langSelect.addEventListener('change', (e) => applyLanguage(e.target.value));
+
+    applyLanguage('en');
+    animateUsers();
+  </script>
+</body>
+</html>
